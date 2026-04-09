@@ -1,17 +1,22 @@
 import sys
 import io
 import json
+import os
+from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from google import genai
 from google.genai import types
 
+load_dotenv()  # Load environment variables from .env file
+
+
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 class NoteRequest(BaseModel):
     content: str
+API_KEY = os.getenv("GEMINI_API_KEY")
 
-API_KEY = "AIzaSyB4glTyhImMD6q3Sv9Z5-UyDSfOexoiW-A"
 client = genai.Client(api_key=API_KEY)
 
 app = FastAPI(title="ALCS AI - Knowledge Engineering Assistant")
