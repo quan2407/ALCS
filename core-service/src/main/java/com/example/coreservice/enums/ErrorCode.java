@@ -9,7 +9,9 @@ import org.springframework.http.HttpStatusCode;
 @AllArgsConstructor
 public enum ErrorCode {
     UNCATEGORIZED_EXCEPTION(9999, "Lỗi chưa xác định", HttpStatus.INTERNAL_SERVER_ERROR),
-
+    USER_NOT_FOUND(1003, "Người dùng không tồn tại", HttpStatus.NOT_FOUND),
+    UNAUTHENTICATED(1004, "Sai email hoặc mật khẩu", HttpStatus.UNAUTHORIZED),
+    USER_EXISTED(1005, "Email này đã được sử dụng", HttpStatus.BAD_REQUEST),
     AI_SERVICE_TIMEOUT(1001, "AI Service phản hồi quá chậm, vui lòng thử lại sau", HttpStatus.GATEWAY_TIMEOUT),
     AI_RESPONSE_MALFORMED(1002, "Dữ liệu từ AI trả về không đúng định dạng", HttpStatus.INTERNAL_SERVER_ERROR),
     KNOWLEDGE_ATOM_NOT_FOUND(2001, "Không tìm thấy Knowledge Atom yêu cầu", HttpStatus.NOT_FOUND),

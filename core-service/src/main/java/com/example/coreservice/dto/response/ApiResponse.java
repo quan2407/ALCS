@@ -1,4 +1,4 @@
-package com.example.coreservice.dto;
+package com.example.coreservice.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,7 +14,7 @@ public class ApiResponse<T> {
     private T data;
     private LocalDateTime timestamp;
 
-    private static <T> ApiResponse<T> success(T data, String message) {
+    public static <T> ApiResponse<T> success(T data, String message) {
         return ApiResponse.<T>builder()
                 .success(true)
                 .message(message)

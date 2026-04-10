@@ -1,8 +1,7 @@
 package com.example.coreservice.exception;
 
-import com.example.coreservice.dto.ErrorResponse;
+import com.example.coreservice.dto.response.ErrorResponse;
 import com.example.coreservice.enums.ErrorCode;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;

@@ -1,4 +1,4 @@
-package com.example.coreservice.dto;
+package com.example.coreservice.dto.response;
 
 import lombok.Builder;
 import lombok.Data;
