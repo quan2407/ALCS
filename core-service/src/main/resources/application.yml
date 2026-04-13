@@ -8,7 +8,7 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     show-sql: true
     properties:
       hibernate:
@@ -17,6 +17,18 @@ spring:
   jackson:
     property-naming-strategy: SNAKE_CASE
     default-property-inclusion: non_null
+  mail:
+    host: sandbox.smtp.mailtrap.io
+    port: 2525
+    username: 5a119dcb9385e8
+    password: 3254d2120c9689
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
 server:
   port: 8080
 springdoc:
@@ -30,3 +42,4 @@ application:
     jwt:
       secret-key: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970 # Chuỗi hex 256-bit
       expiration: 86400000
+
