@@ -38,6 +38,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         jwt = authHeader.substring(7);
+        String tokenType = jwtService.extractClaim(jwt, claims -> claims.get("type", String.class));
+
+        if (!"ACCESS".equals(tokenType)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         userEmail = jwtService.extractUsername(jwt);
 
         // trong trường hợp email đó không có trong security context holder

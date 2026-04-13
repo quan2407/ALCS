@@ -1,9 +1,6 @@
 package com.example.coreservice.controller;
 
-import com.example.coreservice.dto.request.AuthenticationRequest;
-import com.example.coreservice.dto.request.RegisterRequest;
-import com.example.coreservice.dto.request.ResendCodeRequest;
-import com.example.coreservice.dto.request.VerifyRequest;
+import com.example.coreservice.dto.request.*;
 import com.example.coreservice.dto.response.AuthenticationResponse;
 import com.example.coreservice.dto.response.ApiResponse;
 import com.example.coreservice.service.auth.AuthenticationService;
@@ -39,6 +36,14 @@ public class AuthenticationController {
     ) {
         var result = authenticationService.authenticate(request);
         return ResponseEntity.ok(ApiResponse.success(result, "Đăng nhập thành công!"));
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<ApiResponse<AuthenticationResponse>> refreshToken(
+            @RequestBody RefreshTokenRequest request
+    ) {
+        var result = authenticationService.refreshToken(request);
+        return ResponseEntity.ok(ApiResponse.success(result, "Làm mới token thành công!"));
     }
 
     @PostMapping("/verify")

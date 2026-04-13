@@ -18,7 +18,8 @@ public enum ErrorCode {
     INVALID_NOTE_CONTENT(2002, "Nội dung ghi chú không hợp lệ để phân tích", HttpStatus.BAD_REQUEST),
     INVALID_VERIFICATION_CODE(1006, "Mã xác thực không chính xác", HttpStatus.BAD_REQUEST),
     VERIFICATION_CODE_EXPIRED(1007, "Mã xác thực đã hết hạn", HttpStatus.BAD_REQUEST),
-    USER_NOT_VERIFIED(1008, "Tài khoản chưa được xác thực email", HttpStatus.FORBIDDEN);
+    USER_NOT_VERIFIED(1008, "Tài khoản chưa được xác thực email", HttpStatus.FORBIDDEN),
+    USER_ALREADY_VERIFIED(1009, "Tài khoản đã được xác thực trước đó", HttpStatus.BAD_REQUEST);
     private final int code;
     private final String message;
     private final HttpStatusCode statusCode;

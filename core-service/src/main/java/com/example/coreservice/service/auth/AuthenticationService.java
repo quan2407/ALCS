@@ -1,9 +1,6 @@
 package com.example.coreservice.service.auth;
 
-import com.example.coreservice.dto.request.AuthenticationRequest;
-import com.example.coreservice.dto.request.RegisterRequest;
-import com.example.coreservice.dto.request.ResendCodeRequest;
-import com.example.coreservice.dto.request.VerifyRequest;
+import com.example.coreservice.dto.request.*;
 import com.example.coreservice.dto.response.AuthenticationResponse;
 import com.example.coreservice.entity.auth.User;
 import com.example.coreservice.enums.ErrorCode;
@@ -67,13 +64,24 @@ public class AuthenticationService {
         if (!user.isVerified()) {
             throw new AppException(ErrorCode.USER_NOT_VERIFIED);
         }
-        var jwtToken = jwtService.generateToken(user);
-        return AuthenticationResponse.builder()
-                .token(jwtToken)
-                .build();
+        return createAuthResponse(user);
 
     }
+    public AuthenticationResponse refreshToken(RefreshTokenRequest request) {
+        String tokenType = jwtService.extractClaim(request.getRefreshToken(), claims -> claims.get("type", String.class));
 
+        if (!"REFRESH".equals(tokenType)) {
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
+        var user = userRepository.findByRefreshToken(request.getRefreshToken())
+                .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
+
+        if (user.getRefreshExpiry().isBefore(LocalDateTime.now())) {
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
+
+        return createAuthResponse(user);
+    }
     public AuthenticationResponse verifyEmail(VerifyRequest request) {
         var user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
@@ -91,10 +99,7 @@ public class AuthenticationService {
         user.setVerificationExpiry(null);
         userRepository.save(user);
 
-        var jwtToken = jwtService.generateToken(user);
-        return AuthenticationResponse.builder()
-                .token(jwtToken)
-                .build();
+        return createAuthResponse(user);
     }
 
     public void resendVerificationCode(ResendCodeRequest request) {
@@ -102,7 +107,7 @@ public class AuthenticationService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         if (user.isVerified()) {
-            throw new AppException(ErrorCode.INVALID_NOTE_CONTENT); // Tạm dùng hoặc tạo mã mới
+            throw new AppException(ErrorCode.USER_ALREADY_VERIFIED);
         }
 
         String newOtp = String.valueOf(100000 + new java.util.Random().nextInt(900000));
@@ -113,8 +118,20 @@ public class AuthenticationService {
         try {
             emailService.sendVerificationEmail(user.getEmail(), newOtp);
         } catch (Exception e) {
-            // Lỗi hệ thống khi gửi mail
             throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION);
         }
+    }
+    private AuthenticationResponse createAuthResponse(User user) {
+        var accessToken = jwtService.generateToken(user);
+        var refreshToken = jwtService.generateRefreshToken(user);
+
+        user.setRefreshToken(refreshToken);
+        user.setRefreshExpiry(LocalDateTime.now().plusDays(7));
+        userRepository.save(user);
+
+        return AuthenticationResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
     }
 }
