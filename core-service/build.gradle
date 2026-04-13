@@ -40,12 +40,12 @@ dependencies {
     // Test (Gói gọn lại)
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testAnnotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.mockito:mockito-core'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     // 1. Spring Security - Bộ khung bảo mật chính
     implementation 'org.springframework.boot:spring-boot-starter-security'
 
     // 2. JSON Web Token (JWT) - Để tạo và giải mã Token
-    // Mình đề xuất dùng thư viện jjwt rất phổ biến cho Spring
     implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
