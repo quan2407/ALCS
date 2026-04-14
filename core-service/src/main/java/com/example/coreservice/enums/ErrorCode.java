@@ -19,7 +19,9 @@ public enum ErrorCode {
     INVALID_VERIFICATION_CODE(1006, "Mã xác thực không chính xác", HttpStatus.BAD_REQUEST),
     VERIFICATION_CODE_EXPIRED(1007, "Mã xác thực đã hết hạn", HttpStatus.BAD_REQUEST),
     USER_NOT_VERIFIED(1008, "Tài khoản chưa được xác thực email", HttpStatus.FORBIDDEN),
+    NOTE_NOT_FOUND(2003, "Không tìm thấy ghi chú yêu cầu hoặc bạn không có quyền truy cập", HttpStatus.NOT_FOUND),
     USER_ALREADY_VERIFIED(1009, "Tài khoản đã được xác thực trước đó", HttpStatus.BAD_REQUEST);
+
     private final int code;
     private final String message;
     private final HttpStatusCode statusCode;
