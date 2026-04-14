@@ -1,6 +1,6 @@
 package com.example.coreservice.exception;
 
-import com.example.coreservice.dto.response.ErrorResponse;
+import com.example.coreservice.dto.response.ApiResponse;
 import com.example.coreservice.enums.ErrorCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -13,29 +13,28 @@ import java.time.LocalDateTime;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(AppException.class)
-    public ResponseEntity<ErrorResponse> handleAppException(AppException ex, WebRequest request){
+    public ResponseEntity<ApiResponse<Object>> handleAppException(AppException ex) {
         ErrorCode errorCode = ex.getErrorCode();
-        ErrorResponse error = ErrorResponse.builder()
-                .status(errorCode.getStatusCode().value())
-                .error(errorCode.getStatusCode().toString())
-                .message(errorCode.getMessage())
-                .path(request.getDescription(false).replace("uri=", ""))                .timestamp(LocalDateTime.now())
-                .build();
-        return new ResponseEntity<>(error, errorCode.getStatusCode());
-    }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex, WebRequest request){
-        ErrorCode errorCode = ErrorCode.UNCATEGORIZED_EXCEPTION;
-
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .status(errorCode.getStatusCode().value())
-                .error(errorCode.name())
-                .message(ex.getMessage() != null ? ex.getMessage() : errorCode.getMessage())
-                .path(request.getDescription(false).replace("uri=", ""))
+        ApiResponse<Object> response = ApiResponse.<Object>builder()
+                .success(false) // Đánh dấu thất bại
+                .message(errorCode.getMessage()) // Lấy message từ Enum
                 .timestamp(LocalDateTime.now())
                 .build();
 
-        return new ResponseEntity<>(errorResponse, errorCode.getStatusCode());
+        return new ResponseEntity<>(response, errorCode.getStatusCode());
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiResponse<Object>> handleGlobalException(Exception ex) {
+        ErrorCode errorCode = ErrorCode.UNCATEGORIZED_EXCEPTION;
+
+        ApiResponse<Object> response = ApiResponse.<Object>builder()
+                .success(false)
+                .message(ex.getMessage() != null ? ex.getMessage() : errorCode.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        return new ResponseEntity<>(response, errorCode.getStatusCode());
     }
 }

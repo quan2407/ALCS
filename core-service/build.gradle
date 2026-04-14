@@ -53,6 +53,12 @@ dependencies {
 
     // Test Security (Tùy chọn, để viết unit test cho phân quyền)
     testImplementation 'org.springframework.security:spring-security-test'
+    // MapStruct
+    implementation 'org.mapstruct:mapstruct:1.6.3' // Dùng bản 1.6.x cho tương thích Java mới
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+
+    // Binding để MapStruct và Lombok làm việc được với nhau
+    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
 }
 
 tasks.named('test') {
