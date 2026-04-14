@@ -68,5 +68,27 @@ public class NoteService {
 
         return PageResponse.of(notePage, data);
     }
+    @Transactional
+    public NoteResponse updateNote(Long id, NoteRequest request) {
+        User user = securityUtils.getCurrentUser();
+        Note note = noteRepository.findByIdAndUser(id, user)
+                .orElseThrow(() -> new AppException(ErrorCode.NOTE_NOT_FOUND));
+
+        noteMapper.updateNoteFromRequest(request, note);
+
+        note.setWordCount(countWords(note.getContent()));
+
+        return noteMapper.toNoteResponse(noteRepository.save(note));
+    }
+
+    @Transactional
+    public void deleteNote(Long id) {
+        User user = securityUtils.getCurrentUser();
+
+        Note note = noteRepository.findByIdAndUser(id, user)
+                .orElseThrow(() -> new AppException(ErrorCode.NOTE_NOT_FOUND));
+
+        noteRepository.delete(note);
+    }
 
 }
