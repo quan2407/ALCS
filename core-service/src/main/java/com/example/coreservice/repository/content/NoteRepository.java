@@ -12,8 +12,7 @@ import java.util.Optional;
 @Repository
 public interface NoteRepository extends JpaRepository<Note, Long> {
 
-    Page<Note> findAllByUserAndIsArchivedFalse(User user, Pageable pageable);
-
+    Page<Note> findAllByUserAndIsArchivedFalseAndIsDeletedFalse(User user, Pageable pageable);
     Optional<Note> findByIdAndUser(Long id, User user);
 
     long countByUser(User user);

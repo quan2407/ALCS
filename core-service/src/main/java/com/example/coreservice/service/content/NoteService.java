@@ -60,7 +60,7 @@ public class NoteService {
         User user = securityUtils.getCurrentUser();
 
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by("createdAt").descending());
-        Page<Note> notePage = noteRepository.findAllByUserAndIsArchivedFalse(user, pageable);
+        Page<Note> notePage = noteRepository.findAllByUserAndIsArchivedFalseAndIsDeletedFalse(user, pageable);
 
         List<NoteResponse> data = notePage.getContent().stream()
                 .map(noteMapper::toNoteResponse)
@@ -88,7 +88,8 @@ public class NoteService {
         Note note = noteRepository.findByIdAndUser(id, user)
                 .orElseThrow(() -> new AppException(ErrorCode.NOTE_NOT_FOUND));
 
-        noteRepository.delete(note);
+        note.setDeleted(true);
+        noteRepository.save(note);
     }
 
 }

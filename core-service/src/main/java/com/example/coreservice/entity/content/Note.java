@@ -63,6 +63,7 @@ public class Note extends BaseEntity {
     private Set<String> tags = new HashSet<>();
     // nếu archive là true thì sẽ ẩn đi nhưng không xóa để sau này tiện tra
     private boolean isArchived = false;
+    private boolean isDeleted = false;
     private boolean isPublic = false;
 
     @Column(columnDefinition = "TEXT")

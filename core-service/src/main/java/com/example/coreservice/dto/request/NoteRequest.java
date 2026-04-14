@@ -26,5 +26,5 @@ public class NoteRequest {
 
     private Set<String> tags;
 
-    private boolean isPublic;
+    private Boolean isPublic;
 }
