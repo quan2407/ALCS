@@ -4,9 +4,11 @@ import com.example.coreservice.dto.request.NoteRequest;
 import com.example.coreservice.dto.response.ApiResponse;
 import com.example.coreservice.dto.response.NoteResponse;
 import com.example.coreservice.dto.response.PageResponse;
+import com.example.coreservice.service.content.KnowledgeExtractionService;
 import com.example.coreservice.service.content.NoteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class NoteController {
     private final NoteService noteService;
+    private final KnowledgeExtractionService extractionService;
     @PostMapping
     public ApiResponse<NoteResponse> createNote(@RequestBody @Valid NoteRequest request){
         NoteResponse data = noteService.createNote(request);
@@ -41,5 +44,11 @@ public class NoteController {
     public ApiResponse<Void> deleteNote(@PathVariable Long id) {
         noteService.deleteNote(id);
         return ApiResponse.success(null, "Note deleted successfully");
+    }
+    @PostMapping("/{id}/extract")
+    public ResponseEntity<String> extractKnowledge(@PathVariable Long id) {
+        extractionService.extractAtomsFromNote(id);
+        // Vì quá trình gọi AI chạy ngầm (Asynchronous), mình trả về 202 Accepted
+        return ResponseEntity.accepted().body("Yêu cầu trích xuất đang được xử lý...");
     }
 }

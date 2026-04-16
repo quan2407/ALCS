@@ -63,11 +63,16 @@ public class Note extends BaseEntity {
     private Set<String> tags = new HashSet<>();
     // nếu archive là true thì sẽ ẩn đi nhưng không xóa để sau này tiện tra
     private boolean isArchived = false;
+    @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean isDeleted = false;
     private boolean isPublic = false;
 
+    ///
+    /// Tạo ra tọa độ ghi chú trong không gian đa chiều
+    /// AI chuyển văn bản thành mảng vector
+    /// ý nghĩa càng giống nhau -> khoảng cách giữa các vector càng ngắn
     @Column(columnDefinition = "TEXT")
-    private String embeddingVector; // Lưu tạm String nếu chưa dùng pgvector
+    private String embeddingVector;
     private String embeddingVersion;
     private LocalDateTime lastEmbeddedAt;
 
