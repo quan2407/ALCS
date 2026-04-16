@@ -2,6 +2,7 @@ import sys
 import io
 import json
 import os
+import numpy as np
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Header,Depends,Security
 from pydantic import BaseModel
@@ -26,6 +27,75 @@ async def verify_internal_auth(x_internal_token: str = Header(None,alias="X-ALCS
     if not x_internal_token or x_internal_token != INTERNAL_SECRET:
         raise HTTPException(status_code=403, detail="Forbidden: Invalid or missing internal security token.")
     return x_internal_token
+
+#--- Tạo embeddings cho nội dung ghi chú ---
+#Sử dụng model "text-embedding-004" để tạo vector biểu diễn cho nội dung ghi chú, giúp so sánh và loại bỏ các Knowledge Atoms tương tự nhau dựa trên độ tương đồng cosine.
+def get_embeddings(text: str):
+    try:
+        # Sử dụng model mà script test vừa liệt kê
+        result = client.models.embed_content(
+            model="models/gemini-embedding-2-preview", 
+            contents=text,
+            config=types.EmbedContentConfig(task_type="RETRIEVAL_DOCUMENT")
+        )
+        return result.embeddings[0].values
+    except Exception as e:
+        print(f"Lỗi với gemini-embedding-2: {e}")
+        # Fallback sang bản ổn định 001
+        try:
+            result = client.models.embed_content(
+                model="models/gemini-embedding-001",
+                contents=text
+            )
+            return result.embeddings[0].values
+        except:
+            return None
+#--- Tính toán độ tương đồng cosine giữa hai vector ---
+#--- Dùng cosine để tính góc giữa 2 vector
+#--- Góc bằng 0 độ -> cosine similarity = 1 (rất giống nhau)
+#--- Góc bằng 90 độ -> cosine similarity = 0 (không liên quan)
+def cosine_similarity(vec1, vec2):
+    return np.dot(vec1, vec2) / (np.linalg.norm(vec1) * np.linalg.norm(vec2))
+
+def semantic_deduplication(atoms, threshold=0.90):
+    if not atoms: return []
+    
+    # 1. Lấy Vector cho từng Atom
+    for atom in atoms:
+        text_to_embed = f"{atom.get('title', '')} {atom.get('content', '')}"
+        atom['vector'] = get_embeddings(text_to_embed)
+
+    unique_atoms = []
+    for atom in atoms:
+        if atom.get('vector') is None:
+            unique_atoms.append(atom)
+            continue
+            
+        is_duplicate = False
+        for i in range(len(unique_atoms)):
+            if unique_atoms[i].get('vector') is None: continue
+            
+            # Tính độ tương đồng Cosine
+            similarity = cosine_similarity(atom['vector'], unique_atoms[i]['vector'])
+            
+            # Log ra để Quân theo dõi "bộ não" AI đang nghĩ gì
+            print(f"Check: [{atom.get('title')[:20]}...] vs [{unique_atoms[i].get('title')[:20]}...] | Sim: {similarity:.4f}")
+
+            if similarity > threshold:
+                # Nếu trùng, giữ cái quan trọng hơn
+                if atom.get('importanceScore', 0) > unique_atoms[i].get('importanceScore', 0):
+                    unique_atoms[i] = atom
+                is_duplicate = True
+                break
+        
+        if not is_duplicate:
+            unique_atoms.append(atom)
+
+    # 3. Xóa vector tạm trước khi trả về cho Java
+    for atom in unique_atoms:
+        if 'vector' in atom: del atom['vector']
+            
+    return unique_atoms
 
 #Tư duy của AI được định hướng để trích xuất 'Knowledge Atoms' từ nội dung ghi chú. Yêu cầu trả về chỉ là một mảng JSON với cấu trúc cụ thể.
 #Knowledge Atom là đơn vị kiến thức nhỏ nhất, 
@@ -87,6 +157,9 @@ async def analyze_text(
                     atom["difficultyScore"] = float(atom["difficultyScore"])
                 if "importanceScore" in atom:
                     atom["importanceScore"] = float(atom["importanceScore"])
+
+                clean_data = semantic_deduplication(raw_data)
+                return clean_data
 
         return raw_data
 
