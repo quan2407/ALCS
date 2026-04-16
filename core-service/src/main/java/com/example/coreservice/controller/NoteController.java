@@ -2,6 +2,7 @@ package com.example.coreservice.controller;
 
 import com.example.coreservice.dto.request.NoteRequest;
 import com.example.coreservice.dto.response.ApiResponse;
+import com.example.coreservice.dto.response.KnowledgeAtomResponse;
 import com.example.coreservice.dto.response.NoteResponse;
 import com.example.coreservice.dto.response.PageResponse;
 import com.example.coreservice.service.content.KnowledgeExtractionService;
@@ -10,6 +11,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/notes")
@@ -48,7 +51,10 @@ public class NoteController {
     @PostMapping("/{id}/extract")
     public ResponseEntity<String> extractKnowledge(@PathVariable Long id) {
         extractionService.extractAtomsFromNote(id);
-        // Vì quá trình gọi AI chạy ngầm (Asynchronous), mình trả về 202 Accepted
         return ResponseEntity.accepted().body("Yêu cầu trích xuất đang được xử lý...");
+    }
+    @GetMapping("/{id}/atoms")
+    public ApiResponse<List<KnowledgeAtomResponse>> getAtoms(@PathVariable Long id) {
+        return ApiResponse.success(noteService.getAtomsByNoteId(id));
     }
 }

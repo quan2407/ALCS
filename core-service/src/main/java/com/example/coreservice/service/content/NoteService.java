@@ -1,13 +1,16 @@
 package com.example.coreservice.service.content;
 
 import com.example.coreservice.dto.request.NoteRequest;
+import com.example.coreservice.dto.response.KnowledgeAtomResponse;
 import com.example.coreservice.dto.response.NoteResponse;
 import com.example.coreservice.dto.response.PageResponse;
 import com.example.coreservice.entity.auth.User;
 import com.example.coreservice.entity.content.Note;
 import com.example.coreservice.enums.ErrorCode;
 import com.example.coreservice.exception.AppException;
+import com.example.coreservice.mapper.content.KnowledgeAtomMapper;
 import com.example.coreservice.mapper.content.NoteMapper;
+import com.example.coreservice.repository.content.KnowledgeAtomRepository;
 import com.example.coreservice.repository.content.NoteRepository;
 import com.example.coreservice.util.SecurityUtils;
 import jakarta.transaction.Transactional;
@@ -27,6 +30,8 @@ public class NoteService {
     private final NoteRepository noteRepository;
     private final SecurityUtils securityUtils;
     private final NoteMapper noteMapper;
+    private final KnowledgeAtomRepository atomRepository;
+    private final KnowledgeAtomMapper atomMapper;
 
     @Transactional
     public NoteResponse createNote(NoteRequest request) {
@@ -92,4 +97,12 @@ public class NoteService {
         noteRepository.save(note);
     }
 
+    public List<KnowledgeAtomResponse> getAtomsByNoteId(Long noteId) {
+        Note note = noteRepository.findById(noteId)
+                .orElseThrow(() -> new AppException(ErrorCode.NOTE_NOT_FOUND));
+
+        return atomRepository.findAllByNoteOrderByCreatedAtDesc(note).stream()
+                .map(atomMapper::toResponse)
+                .toList();
+    }
 }
