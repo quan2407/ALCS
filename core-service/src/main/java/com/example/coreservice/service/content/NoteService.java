@@ -1,10 +1,12 @@
 package com.example.coreservice.service.content;
 
+import com.example.coreservice.dto.request.KnowledgeAtomUpdateRequest;
 import com.example.coreservice.dto.request.NoteRequest;
 import com.example.coreservice.dto.response.KnowledgeAtomResponse;
 import com.example.coreservice.dto.response.NoteResponse;
 import com.example.coreservice.dto.response.PageResponse;
 import com.example.coreservice.entity.auth.User;
+import com.example.coreservice.entity.content.KnowledgeAtom;
 import com.example.coreservice.entity.content.Note;
 import com.example.coreservice.enums.ErrorCode;
 import com.example.coreservice.exception.AppException;
@@ -104,5 +106,33 @@ public class NoteService {
         return atomRepository.findAllByNoteOrderByCreatedAtDesc(note).stream()
                 .map(atomMapper::toResponse)
                 .toList();
+    }
+    @Transactional
+    public KnowledgeAtomResponse updateAtom(Long atomId, KnowledgeAtomUpdateRequest request) {
+        KnowledgeAtom atom = atomRepository.findById(atomId)
+                .orElseThrow(() -> new AppException(ErrorCode.KNOWLEDGE_ATOM_NOT_FOUND));
+
+        atom.setTitle(request.getTitle());
+        atom.setContent(request.getContent());
+        atom.setType(request.getType());
+
+        if (request.getDifficultyScore() != null) {
+            atom.setDifficultyScore(request.getDifficultyScore());
+        }
+        if (request.getImportanceScore() != null) {
+            atom.setImportanceScore(request.getImportanceScore());
+        }
+
+        return atomMapper.toResponse(atomRepository.save(atom));
+    }
+
+    @Transactional
+    public void deleteAtom(Long atomId) {
+        if (!atomRepository.existsById(atomId)) {
+            throw new AppException(ErrorCode.KNOWLEDGE_ATOM_NOT_FOUND);
+        }
+
+        // 2. Thực hiện xóa
+        atomRepository.deleteById(atomId);
     }
 }

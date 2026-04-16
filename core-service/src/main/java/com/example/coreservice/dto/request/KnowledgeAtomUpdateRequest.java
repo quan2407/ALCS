@@ -1,0 +1,21 @@
+package com.example.coreservice.dto.request;
+
+import com.example.coreservice.enums.AtomType;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+
+@Data
+public class KnowledgeAtomUpdateRequest {
+    @NotBlank(message = "Tiêu đề không được để trống")
+    private String title;
+
+    @NotBlank(message = "Nội dung không được để trống")
+    private String content;
+
+    @NotNull(message = "Loại kiến thức không được để trống")
+    private AtomType type;
+
+    private Double difficultyScore;
+    private Double importanceScore;
+}

@@ -1,5 +1,6 @@
 package com.example.coreservice.controller;
 
+import com.example.coreservice.dto.request.KnowledgeAtomUpdateRequest;
 import com.example.coreservice.dto.request.NoteRequest;
 import com.example.coreservice.dto.response.ApiResponse;
 import com.example.coreservice.dto.response.KnowledgeAtomResponse;
@@ -55,6 +56,24 @@ public class NoteController {
     }
     @GetMapping("/{id}/atoms")
     public ApiResponse<List<KnowledgeAtomResponse>> getAtoms(@PathVariable Long id) {
-        return ApiResponse.success(noteService.getAtomsByNoteId(id));
+        var data = noteService.getAtomsByNoteId(id);
+
+        return ApiResponse.success(data, "Lấy danh sách mảnh kiến thức thành công!");
+    }
+
+    @PutMapping("/atoms/{atomId}")
+    public ApiResponse<KnowledgeAtomResponse> updateAtom(
+            @PathVariable Long atomId,
+            @Valid @RequestBody KnowledgeAtomUpdateRequest request) {
+
+        KnowledgeAtomResponse data = noteService.updateAtom(atomId, request);
+        return ApiResponse.success(data, "Cập nhật mảnh kiến thức thành công!");
+    }
+
+    @DeleteMapping("/atoms/{atomId}")
+    public ApiResponse<Void> deleteAtom(@PathVariable Long atomId) {
+        noteService.deleteAtom(atomId);
+
+        return ApiResponse.success(null, "Đã xóa mảnh kiến thức thành công!");
     }
 }
