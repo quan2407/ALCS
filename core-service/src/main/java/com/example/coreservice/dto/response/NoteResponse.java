@@ -1,6 +1,7 @@
 package com.example.coreservice.dto.response;
 
 import com.example.coreservice.enums.ContentFormat;
+import com.example.coreservice.enums.ProcessingStatus;
 import com.example.coreservice.enums.SourceType;
 import lombok.*;
 
@@ -25,4 +26,5 @@ public class NoteResponse {
     private boolean isPublic;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private ProcessingStatus processingStatus;
 }

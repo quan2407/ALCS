@@ -3,6 +3,7 @@ package com.example.coreservice.entity.content;
 import com.example.coreservice.entity.BaseEntity;
 import com.example.coreservice.entity.auth.User;
 import com.example.coreservice.enums.ContentFormat;
+import com.example.coreservice.enums.ProcessingStatus;
 import com.example.coreservice.enums.SourceType;
 import jakarta.persistence.*;
 import lombok.*;
@@ -66,7 +67,8 @@ public class Note extends BaseEntity {
     @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean isDeleted = false;
     private boolean isPublic = false;
-
+    @Enumerated(EnumType.STRING)
+    private ProcessingStatus processingStatus = ProcessingStatus.IDLE;
     ///
     /// Tạo ra tọa độ ghi chú trong không gian đa chiều
     /// AI chuyển văn bản thành mảng vector

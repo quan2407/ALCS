@@ -73,7 +73,6 @@ public class NoteController {
     @DeleteMapping("/atoms/{atomId}")
     public ApiResponse<Void> deleteAtom(@PathVariable Long atomId) {
         noteService.deleteAtom(atomId);
-
         return ApiResponse.success(null, "Đã xóa mảnh kiến thức thành công!");
     }
 }
