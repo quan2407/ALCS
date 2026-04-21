@@ -1,0 +1,120 @@
+.container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #ffffff;
+}
+
+.box {
+  width: 380px;
+  text-align: center;
+}
+
+.logo {
+  font-size: 36px;
+  margin-bottom: 12px;
+}
+
+.title {
+  margin-bottom: 6px !important;
+}
+
+.subtitle {
+  color: #888;
+  display: block;
+  margin-bottom: 28px;
+}
+
+.form {
+  margin-bottom: 20px;
+}
+
+/* ===== INPUT ===== */
+.input {
+  margin-bottom: 14px;
+}
+
+/* 🔥 FIX DỨT ĐIỂM nền xám của antd */
+:global(.ant-input),
+:global(.ant-input-affix-wrapper) {
+  display: flex;
+  align-items: center;
+  padding: 0 11px;
+  border-radius: 8px;
+  border: 1px solid #d9d9d9;
+  height: 44px;
+}
+
+/* hover + focus không bị xám */
+:global(.ant-input:hover),
+:global(.ant-input:focus),
+:global(.ant-input-affix-wrapper:hover),
+:global(.ant-input-affix-wrapper-focused) {
+  background-color: #ffffff !important;
+  border-color: #1677ff;
+  box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.1);
+}
+
+/* 🔴 ERROR STATE */
+:global(.ant-input-status-error),
+:global(.ant-input-affix-wrapper-status-error) {
+  border-color: #ff4d4f !important;
+  box-shadow: none !important;
+}
+
+/* ===== BUTTON ===== */
+.button {
+  height: 44px;
+  font-size: 16px;
+  font-weight: 500;
+  border-radius: 8px;
+}
+
+/* ===== DIVIDER ===== */
+.divider {
+  margin: 24px 0;
+  color: #aaa;
+  font-size: 12px;
+}
+
+/* ===== GOOGLE BUTTON ===== */
+.googleBtn {
+  height: 44px;
+  border-radius: 8px;
+  font-weight: 500;
+  border: 1px solid #ddd;
+  background: #fff;
+  transition: all 0.2s ease;
+}
+
+.googleBtn:hover {
+  border-color: #bbb;
+  background: #fafafa;
+}
+
+/* ===== SIGN UP ===== */
+.signup {
+  margin-top: 20px;
+  font-size: 14px;
+}
+
+.signup a {
+  font-weight: 500;
+}
+:global(input:-webkit-autofill),
+:global(input:-webkit-autofill:hover),
+:global(input:-webkit-autofill:focus),
+:global(textarea:-webkit-autofill),
+:global(select:-webkit-autofill) {
+  -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important;
+  box-shadow: 0 0 0px 1000px #ffffff inset !important;
+  -webkit-text-fill-color: #000 !important;
+  transition: background-color 9999s ease-in-out 0s;
+}
+/* fix input bên trong password */
+:global(.ant-input-affix-wrapper input) {
+  height: 100% !important;
+  border: none !important;
+  background: transparent !important;
+}
