@@ -35,7 +35,6 @@
   margin-bottom: 14px;
 }
 
-/* 🔥 FIX DỨT ĐIỂM nền xám của antd */
 :global(.ant-input),
 :global(.ant-input-affix-wrapper) {
   display: flex;
@@ -46,7 +45,6 @@
   height: 44px;
 }
 
-/* hover + focus không bị xám */
 :global(.ant-input:hover),
 :global(.ant-input:focus),
 :global(.ant-input-affix-wrapper:hover),
@@ -56,14 +54,12 @@
   box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.1);
 }
 
-/* 🔴 ERROR STATE */
 :global(.ant-input-status-error),
 :global(.ant-input-affix-wrapper-status-error) {
   border-color: #ff4d4f !important;
   box-shadow: none !important;
 }
 
-/* ===== BUTTON ===== */
 .button {
   height: 44px;
   font-size: 16px;
@@ -112,7 +108,6 @@
   -webkit-text-fill-color: #000 !important;
   transition: background-color 9999s ease-in-out 0s;
 }
-/* fix input bên trong password */
 :global(.ant-input-affix-wrapper input) {
   height: 100% !important;
   border: none !important;
