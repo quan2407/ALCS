@@ -8,40 +8,49 @@ import {
   MenuUnfoldOutlined,
   PlusOutlined,
 } from "@ant-design/icons";
+import { getNotes } from "../api/note";
 import styles from "./MainLayout.module.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Dropdown } from "antd";
 import { UserOutlined, LogoutOutlined } from "@ant-design/icons";
 const { Header, Sider, Content } = Layout;
 
-export default function MainLayout({ children }: { children: React.ReactNode }) {
+export default function MainLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [collapsed, setCollapsed] = useState(false);
-const menuItems = [
-  {
-    key: "profile",
-    label: (
-      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <UserOutlined />
-        Profile
-      </div>
-    ),
-  },
-  {
-    type: "divider" as const,
-  },
-  {
-    key: "logout",
-    label: (
-      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <LogoutOutlined />
-        Log out
-      </div>
-    ),
-  },
-];
+  const [notes, setNotes] = useState<any[]>([]);
+  const [selectedNote, setSelectedNote] = useState<any>(null);
+  const menuItems = [
+    {
+      key: "profile",
+      label: (
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <UserOutlined />
+          Profile
+        </div>
+      ),
+    },
+    {
+      type: "divider" as const,
+    },
+    {
+      key: "logout",
+      label: (
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <LogoutOutlined />
+          Log out
+        </div>
+      ),
+    },
+  ];
+  useEffect(() => {
+    getNotes().then((res) => setNotes(res.list));
+  }, []);
   return (
     <Layout className={styles.layout}>
-      
       {/* ===== SIDEBAR ===== */}
       <Sider
         width={260}
@@ -51,7 +60,6 @@ const menuItems = [
         className={styles.sider}
       >
         <div className={styles.sidebarInner}>
-
           {/* ===== TOP BAR (ALIGN HEADER) ===== */}
           <div className={styles.topBar}>
             <div
@@ -61,9 +69,7 @@ const menuItems = [
               {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
             </div>
 
-            {!collapsed && (
-              <div className={styles.logo}>SMART NOTE</div>
-            )}
+            {!collapsed && <div className={styles.logo}>SMART NOTE</div>}
           </div>
 
           {/* ===== SEARCH ===== */}
@@ -96,73 +102,75 @@ const menuItems = [
 
           {/* ===== NOTE LIST ===== */}
           <div className={styles.noteList}>
-
             <div className={styles.noteItem}>
               <PlusOutlined />
               {!collapsed && <span>New Note</span>}
             </div>
 
-            {!collapsed && (
-              <div className={styles.sectionTitle}>Recent</div>
-            )}
+            {!collapsed && <div className={styles.sectionTitle}>Recent</div>}
 
             {!collapsed && (
               <>
-                <div className={styles.noteItem}>Vấn đề không kéo đủ USDT</div>
-                <div className={styles.noteItem}>Thành phố Pripyat tham quan</div>
-                <div className={styles.noteItem}>Ký hiệu trên biểu đồ</div>
-                <div className={styles.noteItem}>Greeting exchange</div>
-                <div className={styles.noteItem}>So sánh ChatGPT Free Go</div>
-                <div className={styles.noteItem}>Không được trứng game</div>
-                <div className={styles.noteItem}>Giúp đỡ và hỗ trợ</div>
-                <div className={styles.noteItem}>Giao tiếp ngắn gọn</div>
-                <div className={styles.noteItem}>GPT phiên bản 5.2</div>
+                {notes.map((note) => (
+                  <div
+                    key={note.id}
+                    className={styles.noteItem}
+                    onClick={() => setSelectedNote(note)}
+                  >
+                    {note.title}
+                  </div>
+                ))}
               </>
             )}
           </div>
 
           {/* ===== PROFILE ===== */}
           <Dropdown
-  menu={{
-    items: menuItems,
-    onClick: ({ key }) => {
-      if (key === "profile") {
-        console.log("Go to profile");
-      }
-      if (key === "logout") {
-        console.log("Logout");
-      }
-    },
-  }}
-  trigger={["click"]}
-  placement="topLeft"
->
-  <div className={styles.profile}>
-    <div className={styles.avatar}>QN</div>
+            menu={{
+              items: menuItems,
+              onClick: ({ key }) => {
+                if (key === "profile") {
+                  console.log("Go to profile");
+                }
+                if (key === "logout") {
+                  console.log("Logout");
+                }
+              },
+            }}
+            trigger={["click"]}
+            placement="topLeft"
+          >
+            <div className={styles.profile}>
+              <div className={styles.avatar}>QN</div>
 
-    {!collapsed && (
-      <div className={styles.profileInfo}>
-        <div className={styles.username}>Quân Nguyễn</div>
-        <div className={styles.plan}>Go</div>
-      </div>
-    )}
-  </div>
-</Dropdown>
-
+              {!collapsed && (
+                <div className={styles.profileInfo}>
+                  <div className={styles.username}>Quân Nguyễn</div>
+                  <div className={styles.plan}>Go</div>
+                </div>
+              )}
+            </div>
+          </Dropdown>
         </div>
       </Sider>
 
       {/* ===== MAIN ===== */}
       <Layout>
         <Header className={styles.header} />
-        
+
         <Content className={styles.content}>
           <div className={styles.contentInner}>
-            {children}
+            {selectedNote ? (
+              <>
+                <h2>{selectedNote.title}</h2>
+                <p>{selectedNote.content}</p>
+              </>
+            ) : (
+              <div>Select a note</div>
+            )}
           </div>
         </Content>
       </Layout>
-
     </Layout>
   );
 }
