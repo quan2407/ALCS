@@ -1,24 +1,47 @@
 import { useEffect, useState } from "react";
-import { getNotes } from "../../api/note";
+import MainLayout from "../../layouts/MainLayout";
+import { getNotes, createNote } from "../../api/note";
 
 export default function NotesPage() {
   const [notes, setNotes] = useState<any[]>([]);
+  const [selectedNote, setSelectedNote] = useState<any>(null);
 
   useEffect(() => {
-  getNotes()
-    .then((data) => {
-      setNotes(data.list);
-    })
-    .catch(console.log);
-}, []);
+    getNotes().then((res) => {
+      setNotes(res.list);
+      if (res.list.length > 0) {
+        setSelectedNote(res.list[0]);
+      }
+    });
+  }, []);
+
+  const handleCreateNote = async () => {
+    const res = await createNote({
+      title: "Untitled",
+      content: "",
+    });
+
+    const newNote = res.data.data;
+
+    setNotes((prev) => [newNote, ...prev]);
+    setSelectedNote(newNote);
+  };
 
   return (
-    <div>
-      <h2>My Notes</h2>
-
-      {notes.map((n: any) => (
-        <div key={n.id}>{n.title}</div>
-      ))}
-    </div>
+    <MainLayout
+      notes={notes}
+      selectedNote={selectedNote}
+      onSelectNote={setSelectedNote}
+      onCreateNote={handleCreateNote}
+    >
+      {selectedNote ? (
+        <>
+          <h2>{selectedNote.title}</h2>
+          <p>{selectedNote.content}</p>
+        </>
+      ) : (
+        <div>Select a note</div>
+      )}
+    </MainLayout>
   );
 }
