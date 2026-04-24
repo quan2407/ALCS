@@ -47,8 +47,14 @@ export default function MainLayout({
     },
   ];
   useEffect(() => {
-    getNotes().then((res) => setNotes(res.list));
+    getNotes().then((res) => {
+      setNotes(res.list);
+      if (res.list.length > 0) {
+        setSelectedNote(res.list[0]);
+      }
+    });
   }, []);
+
   return (
     <Layout className={styles.layout}>
       {/* ===== SIDEBAR ===== */}
@@ -114,7 +120,9 @@ export default function MainLayout({
                 {notes.map((note) => (
                   <div
                     key={note.id}
-                    className={styles.noteItem}
+                    className={`${styles.noteItem} ${
+                      selectedNote?.id === note.id ? styles.active : ""
+                    }`}
                     onClick={() => setSelectedNote(note)}
                   >
                     {note.title}
