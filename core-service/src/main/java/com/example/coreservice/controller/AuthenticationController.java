@@ -42,6 +42,7 @@ public class AuthenticationController {
     public ResponseEntity<ApiResponse<AuthenticationResponse>> refreshToken(
             @RequestBody RefreshTokenRequest request
     ) {
+        System.out.println("REFRESH TOKEN = " + request.getRefreshToken());
         var result = authenticationService.refreshToken(request);
         return ResponseEntity.ok(ApiResponse.success(result, "Làm mới token thành công!"));
     }

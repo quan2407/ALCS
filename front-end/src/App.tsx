@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "./pages/auth/LoginPage";
 import MainLayout from "./layouts/MainLayout";
 import ProtectedRoute from "./routes/ProtectedRoute";
-
+import NotesPage from "./pages/content/NotesPage";
 function App() {
   return (
     <BrowserRouter>
@@ -15,7 +15,7 @@ function App() {
           element={
             <ProtectedRoute>
               <MainLayout>
-                <div>Content here</div>
+                <NotesPage />
               </MainLayout>
             </ProtectedRoute>
           }
