@@ -20,3 +20,9 @@ export const createNote = async () => {
 export const updateNote = (id: number, data: any) => {
   return api.put(`/notes/${id}`, data);
 };
+export const archiveNote = (id: number) => {
+  return api.put(`/notes/${id}/archive`);
+};
+export const deleteNote = (id: number) => {
+  return api.delete(`/notes/${id}`);
+};

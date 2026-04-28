@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import MainLayout from "../../layouts/MainLayout";
 import { getNotes, createNote, updateNote } from "../../api/note";
 import styles from "./NotesPage.module.css";
-
+import { deleteNote, archiveNote } from "../../api/note";
+import { Modal } from "antd";
 export default function NotesPage() {
   const [notes, setNotes] = useState<any[]>([]);
   const [selectedNote, setSelectedNote] = useState<any>(null);
@@ -76,12 +77,48 @@ export default function NotesPage() {
     return () => clearTimeout(timeout);
   }, [selectedNote]);
 
+  const handleArchiveNote = () => {
+    if (!selectedNote) return;
+
+    Modal.confirm({
+      title: "Archive this note?",
+      content: "You can restore it later.",
+      okText: "Archive",
+      cancelText: "Cancel",
+
+      onOk: async () => {
+        await archiveNote(selectedNote.id);
+
+        setNotes((prev) => prev.filter((n) => n.id !== selectedNote.id));
+        setSelectedNote(null);
+      },
+    });
+  };
+
+  const handleDeleteNote = async () => {
+    if (!selectedNote) return;
+    Modal.confirm({
+      title: "Delete this note?",
+      content: "This action cannot be undone.",
+      okText: "Delete",
+      okType: "danger",
+      cancelText: "Cancel",
+      onOk: async () => {
+        await deleteNote(selectedNote.id);
+        setNotes((prev) => prev.filter((n) => n.id !== selectedNote.id));
+        setSelectedNote(null);
+      },
+    });
+  };
+
   return (
     <MainLayout
       notes={notes}
       selectedNote={selectedNote}
       onSelectNote={setSelectedNote}
       onCreateNote={handleCreateNote}
+      onArchiveNote={handleArchiveNote}
+      onDeleteNote={handleDeleteNote}
     >
       {selectedNote ? (
         <div className={styles.editor}>

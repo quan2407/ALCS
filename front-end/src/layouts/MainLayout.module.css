@@ -1,5 +1,6 @@
 .layout {
   height: 100vh;
+  overflow: hidden; /* 🔥 bắt buộc */
 }
 
 .sider {
@@ -11,18 +12,20 @@
   height: 64px;
   background: #ffffff;
   border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0 20px;
 }
 
-/* 🔥 CHỈ SCROLL Ở ĐÂY */
 .content {
-  background: #ffffff;
-  padding: 0;
   height: calc(100vh - 64px);
-  overflow-y: auto;
+  overflow-y: auto; /* 👉 scroll đúng chỗ */
+  background: #ffffff;
 }
 
 .contentInner {
-  max-width: 100%;
-  margin: 0;
-  padding: 0;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 60px 40px 120px;
 }

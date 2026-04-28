@@ -1,7 +1,5 @@
 .editor {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 60px 40px 120px;
+  width: 100%;
 }
 
 /* TITLE */
@@ -16,10 +14,6 @@
   background: transparent;
 }
 
-.titleInput::placeholder {
-  color: #9ca3af;
-}
-
 /* CONTENT */
 .contentInput {
   width: 100%;
@@ -31,10 +25,5 @@
   resize: none;
   background: transparent;
 
-  min-height: 200px; /* 🔥 KHÔNG dùng 100vh */
-}
-
-/* ❌ KHÔNG scroll trong textarea */
-.contentInput::-webkit-scrollbar {
-  display: none;
+  overflow: hidden; /* 🔥 không scroll riêng */
 }

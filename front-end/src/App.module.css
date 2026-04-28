@@ -6,11 +6,7 @@ body,
 
 body {
   margin: 0;
-  overflow: hidden; /* 🔥 KHÔNG scroll ở body */
-}
-
-#root {
-  min-height: 200vh; /* Đặt chiều cao tối thiểu lớn hơn chiều cao viewport */
+  overflow: hidden; /* chỉ cho content scroll */
 }
 
 .counter {
