@@ -49,6 +49,11 @@ public class NoteController {
         noteService.deleteNote(id);
         return ApiResponse.success(null, "Note deleted successfully");
     }
+    @PutMapping("/{id}/archive")
+    public ApiResponse<Void> archiveNote(@PathVariable Long id) {
+        noteService.archiveNote(id);
+        return ApiResponse.success(null, "Note archived successfully");
+    }
     @PostMapping("/{id}/extract")
     public ResponseEntity<String> extractKnowledge(@PathVariable Long id) {
         extractionService.extractAtomsFromNote(id);

@@ -137,4 +137,15 @@ public class NoteService {
         // 2. Thực hiện xóa
         atomRepository.deleteById(atomId);
     }
+
+    @Transactional
+    public void archiveNote(Long id) {
+        User user = securityUtils.getCurrentUser();
+
+        Note note = noteRepository.findByIdAndUser(id, user)
+                .orElseThrow(() -> new AppException(ErrorCode.NOTE_NOT_FOUND));
+
+        note.setArchived(true);
+        noteRepository.save(note);
+    }
 }
