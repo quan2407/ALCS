@@ -39,7 +39,9 @@ public class NoteService {
     public NoteResponse createNote(NoteRequest request) {
         User user = securityUtils.getCurrentUser();
         Note note = noteMapper.toNote(request);
-
+        if (request.getTitle() == null || request.getTitle().isBlank()) {
+            note.setTitle("Untitled");
+        }
         note.setUser(user);
         note.setAtomCount(0L);
         note.setWordCount(countWords(request.getContent()));

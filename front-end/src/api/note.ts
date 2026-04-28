@@ -9,6 +9,14 @@ export const getNotes = async () => {
     page: res.data.data.current_page,
   };
 };
-export const createNote = (data: any) => {
-  return api.post("/notes", data);
-}
+export const createNote = async () => {
+  const res = await api.post("/notes", {
+    title: "",
+    content: "",
+  });
+
+  return res.data.data;
+};
+export const updateNote = (id: number, data: any) => {
+  return api.put(`/notes/${id}`, data);
+};

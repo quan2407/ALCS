@@ -115,7 +115,7 @@
   color: #6b7280;
 }
 .sider {
-  background: #f7f6f3;
+  background: #f7f6f3 !important;
   border-right: 1px solid #e5e5e5;
 }
 

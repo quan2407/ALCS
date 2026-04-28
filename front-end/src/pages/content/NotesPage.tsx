@@ -1,11 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import MainLayout from "../../layouts/MainLayout";
-import { getNotes, createNote } from "../../api/note";
+import { getNotes, createNote, updateNote } from "../../api/note";
+import styles from "./NotesPage.module.css";
 
 export default function NotesPage() {
   const [notes, setNotes] = useState<any[]>([]);
   const [selectedNote, setSelectedNote] = useState<any>(null);
 
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  // ===== LOAD =====
   useEffect(() => {
     getNotes().then((res) => {
       setNotes(res.list);
@@ -15,17 +19,62 @@ export default function NotesPage() {
     });
   }, []);
 
-  const handleCreateNote = async () => {
-    const res = await createNote({
-      title: "Untitled",
-      content: "",
-    });
+  // ===== AUTO RESIZE (DÙNG CHUNG) =====
+  const resizeTextarea = () => {
+    if (!textareaRef.current) return;
 
-    const newNote = res.data.data;
+    const el = textareaRef.current;
+    el.style.height = "auto";
+    el.style.height = el.scrollHeight + "px";
+  };
+
+  // ===== FIX BUG: reload không resize =====
+  useEffect(() => {
+    if (!selectedNote) return;
+
+    // delay 1 tick để DOM render xong
+    setTimeout(() => {
+      resizeTextarea();
+    }, 0);
+  }, [selectedNote]);
+
+  // ===== CREATE =====
+  const handleCreateNote = async () => {
+    const newNote = await createNote();
 
     setNotes((prev) => [newNote, ...prev]);
     setSelectedNote(newNote);
   };
+
+  // ===== CHANGE =====
+  const handleChange = (field: string, value: string) => {
+    setSelectedNote((prev: any) => {
+      const updated = { ...prev, [field]: value };
+
+      // sync sidebar
+      setNotes((prevNotes) =>
+        prevNotes.map((n) =>
+          n.id === updated.id ? { ...n, [field]: value } : n,
+        ),
+      );
+
+      return updated;
+    });
+  };
+
+  // ===== AUTOSAVE =====
+  useEffect(() => {
+    if (!selectedNote) return;
+
+    const timeout = setTimeout(() => {
+      updateNote(selectedNote.id, {
+        title: selectedNote.title || "",
+        content: selectedNote.content || "",
+      });
+    }, 800);
+
+    return () => clearTimeout(timeout);
+  }, [selectedNote]);
 
   return (
     <MainLayout
@@ -35,12 +84,33 @@ export default function NotesPage() {
       onCreateNote={handleCreateNote}
     >
       {selectedNote ? (
-        <>
-          <h2>{selectedNote.title}</h2>
-          <p>{selectedNote.content}</p>
-        </>
+        <div className={styles.editor}>
+          {/* TITLE */}
+          <input
+            className={styles.titleInput}
+            placeholder="Untitled"
+            value={selectedNote.title || ""}
+            onChange={(e) => handleChange("title", e.target.value)}
+          />
+
+          {/* CONTENT */}
+          <textarea
+            ref={textareaRef}
+            className={styles.contentInput}
+            value={selectedNote.content || ""}
+            placeholder="Start writing your note..."
+            onChange={(e) => {
+              handleChange("content", e.target.value);
+
+              // resize realtime
+              const el = e.target;
+              el.style.height = "auto";
+              el.style.height = el.scrollHeight + "px";
+            }}
+          />
+        </div>
       ) : (
-        <div>Select a note</div>
+        <div style={{ padding: 40 }}>Select a note</div>
       )}
     </MainLayout>
   );

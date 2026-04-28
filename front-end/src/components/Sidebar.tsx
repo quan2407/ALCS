@@ -10,8 +10,8 @@ import {
 } from "@ant-design/icons";
 import styles from "./Sidebar.module.css";
 import { useState } from "react";
-
-type Props = {
+import { Dropdown } from "antd";
+import { UserOutlined, LogoutOutlined } from "@ant-design/icons";type Props = {
   notes: any[];
   selectedNote: any;
   onSelectNote: (note: any) => void;
@@ -25,7 +25,29 @@ export default function Sidebar({
   onCreateNote,
 }: Props) {
   const [collapsed, setCollapsed] = useState(false);
-
+  const menuItems = [
+  {
+    key: "profile",
+    label: (
+      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <UserOutlined />
+        Profile
+      </div>
+    ),
+  },
+  {
+    type: "divider" as const,
+  },
+  {
+    key: "logout",
+    label: (
+      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <LogoutOutlined />
+        Log out
+      </div>
+    ),
+  },
+];
   return (
     <div className={styles.sidebarInner}>
       {/* TOP */}
@@ -87,6 +109,35 @@ export default function Sidebar({
             </div>
           ))}
       </div>
+      {/* PROFILE */}
+<Dropdown
+  menu={{
+    items: menuItems,
+    onClick: ({ key }) => {
+      if (key === "profile") {
+        console.log("Go to profile");
+      }
+      if (key === "logout") {
+        console.log("Logout");
+        localStorage.clear();
+        window.location.href = "/login";
+      }
+    },
+  }}
+  trigger={["click"]}
+  placement="topLeft"
+>
+  <div className={styles.profile}>
+    <div className={styles.avatar}>QN</div>
+
+    {!collapsed && (
+      <div className={styles.profileInfo}>
+        <div className={styles.username}>Quân Nguyễn</div>
+        <div className={styles.plan}>Go</div>
+      </div>
+    )}
+  </div>
+</Dropdown>
     </div>
   );
 }

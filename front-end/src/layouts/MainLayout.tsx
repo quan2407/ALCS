@@ -21,15 +21,14 @@ export default function MainLayout({
 }: Props) {
   return (
     <Layout className={styles.layout}>
-      {/* SIDEBAR */}
+      {/* 🔥 SIDER */}
       <Sider
         width={260}
-        collapsedWidth={60}
-        trigger={null}
+        theme="light" // ✅ FIX MÀU
         className={styles.sider}
       >
         <Sidebar
-          notes={notes}
+          notes={notes || []} // ✅ chống crash
           selectedNote={selectedNote}
           onSelectNote={onSelectNote}
           onCreateNote={onCreateNote}

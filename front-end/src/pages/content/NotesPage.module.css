@@ -1,0 +1,40 @@
+.editor {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 60px 40px 120px;
+}
+
+/* TITLE */
+.titleInput {
+  width: 100%;
+  font-size: 44px;
+  font-weight: 700;
+  border: none;
+  outline: none;
+  margin-bottom: 24px;
+  color: #111;
+  background: transparent;
+}
+
+.titleInput::placeholder {
+  color: #9ca3af;
+}
+
+/* CONTENT */
+.contentInput {
+  width: 100%;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  line-height: 1.9;
+  color: #333;
+  resize: none;
+  background: transparent;
+
+  min-height: 200px; /* 🔥 KHÔNG dùng 100vh */
+}
+
+/* ❌ KHÔNG scroll trong textarea */
+.contentInput::-webkit-scrollbar {
+  display: none;
+}

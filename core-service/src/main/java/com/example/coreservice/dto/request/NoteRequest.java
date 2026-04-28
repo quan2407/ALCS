@@ -14,7 +14,6 @@ import java.util.Set;
 @AllArgsConstructor
 public class NoteRequest {
 
-    @NotBlank(message = "TITLE_REQUIRED")
     @Size(max = 255, message = "TITLE_TOO_LONG")
     private String title;
 
