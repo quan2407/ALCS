@@ -1,6 +1,6 @@
 import { Input, Button, Typography } from "antd";
 import { GoogleOutlined } from "@ant-design/icons";
-import styles from "./LoginPage.module.css";
+import styles from "./Auth.module.css";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { loginApi } from "../../api/auth";
@@ -10,7 +10,6 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // 🔴 validation state
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
   const [serverError, setServerError] = useState("");
@@ -20,12 +19,10 @@ export default function LoginPage() {
   const handleLogin = async () => {
     let hasError = false;
 
-    // reset error
     setEmailError(false);
     setPasswordError(false);
     setServerError("");
 
-    // validate
     if (!email) {
       setEmailError(true);
       hasError = true;
@@ -48,10 +45,14 @@ export default function LoginPage() {
       localStorage.setItem("refreshToken", refresh_token);
 
       navigate("/app");
-
     } catch (error: any) {
-      const msg =
-        error?.response?.data?.message || "Login failed";
+      const msg = error?.response?.data?.message || "Login failed";
+      console.log("FULL ERROR:", error?.response?.data);
+      if (msg.toLowerCase().includes("chưa được xác thực")) {
+        localStorage.setItem("verifyEmail", email);
+        navigate(`/verify?email=${email}`);
+        return;
+      }
 
       setServerError(msg);
       setEmailError(true);
@@ -75,7 +76,6 @@ export default function LoginPage() {
         </Typography.Text>
 
         <div className={styles.form}>
-          {/* EMAIL */}
           <Input
             placeholder="Enter your email"
             className={styles.input}
@@ -88,7 +88,6 @@ export default function LoginPage() {
             }}
           />
 
-          {/* PASSWORD */}
           <Input.Password
             placeholder="Enter your password"
             className={styles.input}
@@ -102,21 +101,18 @@ export default function LoginPage() {
             onPressEnter={handleLogin}
           />
 
-          {/* ERROR MESSAGE */}
           {serverError && (
             <div style={{ color: "#ff4d4f", marginBottom: 10, fontSize: 13 }}>
               {serverError}
             </div>
           )}
 
-          {/* BUTTON */}
           <Button
             type="primary"
             block
             className={styles.button}
             loading={loading}
             onClick={handleLogin}
-            htmlType="button"
           >
             Log in
           </Button>
@@ -126,7 +122,6 @@ export default function LoginPage() {
           <span>or continue with</span>
         </div>
 
-        {/* GOOGLE */}
         <Button
           block
           className={styles.googleBtn}
@@ -136,7 +131,6 @@ export default function LoginPage() {
           Continue with Google
         </Button>
 
-        {/* SIGN UP */}
         <div className={styles.signup}>
           New user? <Link to="/register">Sign up</Link>
         </div>

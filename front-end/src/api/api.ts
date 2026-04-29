@@ -23,7 +23,10 @@ api.interceptors.response.use(
   async (error) => {
     const originRequest = error.config;
 
-    if ((error.response?.status === 401 || error.response?.status === 403) && !originRequest._retry) {
+    if (
+      (error.response?.status === 401 || error.response?.status === 403) &&
+      !originRequest._retry
+    ) {
       if (isRefreshing) {
         return new Promise((resolve) => {
           pendingRequests.push((token: string) => {
@@ -40,20 +43,21 @@ api.interceptors.response.use(
       console.log("Attempting token refresh with refreshToken:", refreshToken);
       if (!refreshToken) {
         localStorage.clear();
-        window.location.href = "/login";
+        // window.location.href = "/login";
         return Promise.reject(error);
       }
 
       try {
         // KHÔNG dùng instance, dùng axios gốc để đảm bảo Header sạch 100%
-        const res = await axios.post("http://localhost:8080/api/v1/auth/refresh-token", 
-          { refresh_token: refreshToken }, 
-          { 
-            headers: { 
-                "Content-Type": "application/json",
-                "Authorization": "" // Ép header này trống để Filter Backend không xử lý
-            } 
-          }
+        const res = await axios.post(
+          "http://localhost:8080/api/v1/auth/refresh-token",
+          { refresh_token: refreshToken },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "", // Ép header này trống để Filter Backend không xử lý
+            },
+          },
         );
 
         // Kiểm tra đúng tên field Backend trả về (snake_case hay camelCase)
@@ -66,8 +70,7 @@ api.interceptors.response.use(
         pendingRequests = [];
 
         originRequest.headers.Authorization = `Bearer ${access_token}`;
-        return api(originRequest); 
-
+        return api(originRequest);
       } catch (err) {
         localStorage.clear();
         // window.location.href = "/login";
@@ -77,7 +80,7 @@ api.interceptors.response.use(
       }
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export default api;
