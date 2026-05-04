@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/ALCS.iml" filepath="$PROJECT_DIR$/.idea/ALCS.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/core-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/core-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/core-service.test.iml" filepath="$PROJECT_DIR$/.idea/modules/core-service.test.iml" />
     </modules>
   </component>
 </project>

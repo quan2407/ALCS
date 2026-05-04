@@ -2,7 +2,10 @@ package com.example.coreservice.service.auth;
 
 import com.example.coreservice.dto.request.*;
 import com.example.coreservice.dto.response.AuthenticationResponse;
+import com.example.coreservice.dto.response.GoogleUserInfo;
 import com.example.coreservice.entity.auth.User;
+import com.example.coreservice.entity.auth.UserProfile;
+import com.example.coreservice.enums.AuthProvider;
 import com.example.coreservice.enums.ErrorCode;
 import com.example.coreservice.enums.Role;
 import com.example.coreservice.exception.AppException;
@@ -121,7 +124,7 @@ public class AuthenticationService {
             throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION);
         }
     }
-    private AuthenticationResponse createAuthResponse(User user) {
+    public AuthenticationResponse createAuthResponse(User user) {
         var accessToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
 
@@ -133,5 +136,54 @@ public class AuthenticationService {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
+    }
+
+    public User handleGoogleLogin(GoogleUserInfo googleUser) {
+
+        return userRepository.findByEmail(googleUser.getEmail())
+                .map(existingUser -> handleExistingUser(existingUser, googleUser))
+                .orElseGet(() -> createGoogleUser(googleUser));
+    }
+
+    private User createGoogleUser(GoogleUserInfo googleUser) {
+        User user = User.builder()
+                .email(googleUser.getEmail())
+                .isVerified(true)
+                .role(Role.USER)
+                .provider(AuthProvider.GOOGLE)
+                .providerId(googleUser.getSub())
+                .build();
+
+        UserProfile profile = UserProfile.builder()
+                .firstName(extractFirstName(googleUser.getName()))
+                .lastName(extractLastName(googleUser.getName()))
+                .avatarUrl(googleUser.getPicture())
+                .user(user)
+                .build();
+
+        user.setProfile(profile);
+
+        return userRepository.save(user);
+    }
+
+    private String extractFirstName(String fullName) {
+        if (fullName == null) return null;
+        return fullName.split(" ")[0];
+    }
+
+    private String extractLastName(String fullName) {
+        if (fullName == null) return null;
+        String[] parts = fullName.split(" ");
+        return parts.length > 1 ? parts[parts.length - 1] : "";
+    }
+
+    private User handleExistingUser(User user, GoogleUserInfo googleUser) {
+        if (user.getProvider() == AuthProvider.LOCAL){
+            throw new RuntimeException("Email already registered with password");
+        }
+        if (user.getProviderId() == null){
+            user.setProviderId(googleUser.getSub());
+        }
+        return user;
     }
 }

@@ -1,6 +1,7 @@
 package com.example.coreservice.entity.auth;
 
 import com.example.coreservice.entity.BaseEntity;
+import com.example.coreservice.enums.AuthProvider;
 import com.example.coreservice.enums.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -49,6 +50,11 @@ public class User extends BaseEntity implements UserDetails {
 
     @OneToOne(mappedBy = "user",cascade = CascadeType.ALL)
     private UserProfile profile;
+
+    @Enumerated(EnumType.STRING)
+    private AuthProvider provider;
+
+    private String providerId;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
