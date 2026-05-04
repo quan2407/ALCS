@@ -126,7 +126,9 @@ export default function LoginPage() {
           block
           className={styles.googleBtn}
           icon={<GoogleOutlined />}
-          disabled
+          onClick={() => {
+            window.location.href = "http://localhost:8080/api/v1/auth/google";
+          }}
         >
           Continue with Google
         </Button>

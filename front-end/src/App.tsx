@@ -4,6 +4,7 @@ import RegisterPage from "./pages/auth/RegisterPage";
 import VerifyPage from "./pages/auth/VerifyPage";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import NotesPage from "./pages/content/NotesPage";
+import OAuthSuccess from "./pages/auth/OAuthSuccess";
 
 function App() {
   return (
@@ -13,7 +14,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/verify" element={<VerifyPage />} />
-
+        <Route path="/oauth-success" element={<OAuthSuccess />} />
         {/* APP */}
         <Route
           path="/app"

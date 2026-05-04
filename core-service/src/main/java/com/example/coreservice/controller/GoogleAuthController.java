@@ -33,12 +33,13 @@ public class GoogleAuthController {
                 "?client_id=" + clientId +
                 "&redirect_uri=" + redirectUri +
                 "&response_type=code" +
-                "&scope=openid%20email%20profile";
+                "&scope=openid%20email%20profile" +
+                "&prompt=select_account";
 
         response.sendRedirect(url);
     }
     @GetMapping("/google/callback")
-    public ResponseEntity<?> callback(@RequestParam String code) {
+    public void callback(@RequestParam String code, HttpServletResponse response) throws IOException {
 
         GoogleUserInfo googleUser = googleService.getUserInfo(code);
 
@@ -46,6 +47,10 @@ public class GoogleAuthController {
 
         var authResponse = authenticationService.createAuthResponse(user);
 
-        return ResponseEntity.ok(authResponse);
+        String redirectUrl = "http://localhost:5173/oauth-success" +
+                "?accessToken=" + authResponse.getAccessToken() +
+                "&refreshToken=" + authResponse.getRefreshToken();
+
+        response.sendRedirect(redirectUrl);
     }
 }
