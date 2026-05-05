@@ -26,3 +26,11 @@ export const archiveNote = (id: number) => {
 export const deleteNote = (id: number) => {
   return api.delete(`/notes/${id}`);
 };
+export const extractNote = (id: number) => {
+  return api.post(`/notes/${id}/extract`);
+};
+
+export const getAtoms = async (id: number) => {
+  const res = await api.get(`/notes/${id}/atoms`);
+  return res.data.data;
+};

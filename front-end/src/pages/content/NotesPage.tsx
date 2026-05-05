@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import MainLayout from "../../layouts/MainLayout";
-import { getNotes, createNote, updateNote } from "../../api/note";
+import {
+  getNotes,
+  createNote,
+  updateNote,
+  getAtoms,
+  extractNote,
+} from "../../api/note";
 import styles from "./NotesPage.module.css";
 import { deleteNote, archiveNote } from "../../api/note";
 import { Modal } from "antd";
@@ -9,7 +15,33 @@ export default function NotesPage() {
   const [selectedNote, setSelectedNote] = useState<any>(null);
 
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const [atoms, setAtoms] = useState<any[]>([]);
+  const [extracting, setExtracting] = useState(false);
+  const handleExtract = async () => {
+    if (!selectedNote) return;
 
+    try {
+      setExtracting(true);
+
+      // 1. trigger AI
+      await extractNote(selectedNote.id);
+
+      // 2. get atoms
+      const rawAtoms = await getAtoms(selectedNote.id);
+
+      // 3. map UI
+      const mapped = rawAtoms.map((a: any) => ({
+        id: a.id,
+        title: a.title,
+        content: a.content,
+        type: a.type,
+      }));
+
+      setAtoms(mapped);
+    } finally {
+      setExtracting(false);
+    }
+  };
   // ===== LOAD =====
   useEffect(() => {
     getNotes().then((res) => {
@@ -20,29 +52,22 @@ export default function NotesPage() {
     });
   }, []);
 
-  // ===== AUTO RESIZE (DÙNG CHUNG) =====
+  // ===== AUTO RESIZE =====
   const resizeTextarea = () => {
     if (!textareaRef.current) return;
-
     const el = textareaRef.current;
     el.style.height = "auto";
     el.style.height = el.scrollHeight + "px";
   };
 
-  // ===== FIX BUG: reload không resize =====
   useEffect(() => {
     if (!selectedNote) return;
-
-    // delay 1 tick để DOM render xong
-    setTimeout(() => {
-      resizeTextarea();
-    }, 0);
+    setTimeout(resizeTextarea, 0);
   }, [selectedNote]);
 
   // ===== CREATE =====
   const handleCreateNote = async () => {
     const newNote = await createNote();
-
     setNotes((prev) => [newNote, ...prev]);
     setSelectedNote(newNote);
   };
@@ -52,7 +77,6 @@ export default function NotesPage() {
     setSelectedNote((prev: any) => {
       const updated = { ...prev, [field]: value };
 
-      // sync sidebar
       setNotes((prevNotes) =>
         prevNotes.map((n) =>
           n.id === updated.id ? { ...n, [field]: value } : n,
@@ -77,6 +101,7 @@ export default function NotesPage() {
     return () => clearTimeout(timeout);
   }, [selectedNote]);
 
+  // ===== ACTIONS =====
   const handleArchiveNote = () => {
     if (!selectedNote) return;
 
@@ -84,25 +109,20 @@ export default function NotesPage() {
       title: "Archive this note?",
       content: "You can restore it later.",
       okText: "Archive",
-      cancelText: "Cancel",
-
       onOk: async () => {
         await archiveNote(selectedNote.id);
-
         setNotes((prev) => prev.filter((n) => n.id !== selectedNote.id));
         setSelectedNote(null);
       },
     });
   };
 
-  const handleDeleteNote = async () => {
+  const handleDeleteNote = () => {
     if (!selectedNote) return;
+
     Modal.confirm({
       title: "Delete this note?",
-      content: "This action cannot be undone.",
-      okText: "Delete",
       okType: "danger",
-      cancelText: "Cancel",
       onOk: async () => {
         await deleteNote(selectedNote.id);
         setNotes((prev) => prev.filter((n) => n.id !== selectedNote.id));
@@ -119,8 +139,13 @@ export default function NotesPage() {
       onCreateNote={handleCreateNote}
       onArchiveNote={handleArchiveNote}
       onDeleteNote={handleDeleteNote}
+      onExtract={handleExtract}
+      extracting={extracting}
+      atoms={atoms}
     >
-      {selectedNote ? (
+      {!selectedNote ? (
+        <div style={{ padding: 40, color: "#888" }}>Select a note</div>
+      ) : (
         <div className={styles.editor}>
           {/* TITLE */}
           <input
@@ -139,15 +164,12 @@ export default function NotesPage() {
             onChange={(e) => {
               handleChange("content", e.target.value);
 
-              // resize realtime
               const el = e.target;
               el.style.height = "auto";
               el.style.height = el.scrollHeight + "px";
             }}
           />
         </div>
-      ) : (
-        <div style={{ padding: 40 }}>Select a note</div>
       )}
     </MainLayout>
   );

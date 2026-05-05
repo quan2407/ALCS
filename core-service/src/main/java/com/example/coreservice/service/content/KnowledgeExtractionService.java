@@ -72,7 +72,7 @@ public class KnowledgeExtractionService {
             throw e;
 
         } finally {
-            // 🔥 4. LUÔN SAVE LẠI TRẠNG THÁI
+            // 4. LUÔN SAVE LẠI TRẠNG THÁI
             noteRepository.save(note);
         }
     }

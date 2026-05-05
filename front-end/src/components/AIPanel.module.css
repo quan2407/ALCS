@@ -1,0 +1,91 @@
+.panel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #fafafa;
+}
+
+/* ===== TABS ===== */
+.tabs {
+  display: flex;
+  border-bottom: 1px solid #e5e5e5;
+  background: #fff; /* 👈 thêm để nổi lên */
+}
+
+.tabs button {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+
+  font-size: 14px;
+  color: #6b7280; /* 👈 xám vừa */
+  transition: all 0.2s;
+}
+
+.tabs button:hover {
+  background: #f3f4f6;
+  color: #111; /* 👈 hover đậm hơn */
+}
+
+/* ACTIVE TAB */
+.active {
+  font-weight: 600;
+  color: #111; /* 👈 đậm rõ */
+  border-bottom: 2px solid #111;
+}
+
+/* ===== BODY ===== */
+.body {
+  flex: 1;
+  padding: 16px;
+
+  color: #111; /* 👈 🔥 FIX CHÍNH */
+  font-size: 14px;
+}
+.atom {
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+
+.atomTitle {
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #111;
+}
+
+.atomContent {
+  font-size: 13px;
+  color: #374151;
+  line-height: 1.5;
+}
+
+.atomType {
+  margin-top: 6px;
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.loading {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.empty {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.emptyTitle {
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.emptyDesc {
+  font-size: 13px;
+  color: #6b7280;
+}

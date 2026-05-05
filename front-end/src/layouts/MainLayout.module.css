@@ -1,6 +1,6 @@
 .layout {
   height: 100vh;
-  overflow: hidden; /* 🔥 bắt buộc */
+  overflow: hidden;
 }
 
 .sider {
@@ -8,24 +8,76 @@
   border-right: 1px solid #e5e5e5;
 }
 
+/* ===== HEADER ===== */
 .header {
   height: 64px;
   background: #ffffff;
   border-bottom: 1px solid #eee;
+
   display: flex;
   justify-content: flex-end;
   align-items: center;
+
   padding: 0 20px;
 }
 
+/* 🔥 RIGHT GROUP */
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* 🔥 EXTRACT BUTTON */
+.extractBtn {
+  background: #111;
+  color: white;
+  border-radius: 8px;
+  font-size: 13px;
+  height: 32px;
+  padding: 0 14px;
+  border: none;
+
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.extractBtn:hover {
+  background: #333;
+}
+
+/* ===== CONTENT ===== */
 .content {
   height: calc(100vh - 64px);
-  overflow-y: auto; /* 👉 scroll đúng chỗ */
+  overflow: hidden;
   background: #ffffff;
 }
 
+.mainContainer {
+  display: flex;
+  height: 100%;
+}
+
+/* LEFT */
+.editorArea {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* CENTER CONTENT */
 .contentInner {
-  max-width: 900px;
+  max-width: 720px; /* 👈 đẹp hơn 800 */
   margin: 0 auto;
   padding: 60px 40px 120px;
+}
+
+/* RIGHT PANEL */
+.aiPanel {
+  width: 320px;
+  border-left: 1px solid #e5e5e5;
+  background: #fafafa;
+
+  display: flex;
+  flex-direction: column;
 }
