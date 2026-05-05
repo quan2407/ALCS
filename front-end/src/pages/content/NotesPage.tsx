@@ -10,39 +10,17 @@ import {
 import styles from "./NotesPage.module.css";
 import { deleteNote, archiveNote } from "../../api/note";
 import { Modal } from "antd";
+
 export default function NotesPage() {
   const [notes, setNotes] = useState<any[]>([]);
   const [selectedNote, setSelectedNote] = useState<any>(null);
 
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
   const [atoms, setAtoms] = useState<any[]>([]);
   const [extracting, setExtracting] = useState(false);
-  const handleExtract = async () => {
-    if (!selectedNote) return;
 
-    try {
-      setExtracting(true);
-
-      // 1. trigger AI
-      await extractNote(selectedNote.id);
-
-      // 2. get atoms
-      const rawAtoms = await getAtoms(selectedNote.id);
-
-      // 3. map UI
-      const mapped = rawAtoms.map((a: any) => ({
-        id: a.id,
-        title: a.title,
-        content: a.content,
-        type: a.type,
-      }));
-
-      setAtoms(mapped);
-    } finally {
-      setExtracting(false);
-    }
-  };
-  // ===== LOAD =====
+  // ===== LOAD NOTES =====
   useEffect(() => {
     getNotes().then((res) => {
       setNotes(res.list);
@@ -51,6 +29,21 @@ export default function NotesPage() {
       }
     });
   }, []);
+
+  // ===== LOAD ATOMS =====
+  useEffect(() => {
+    if (!selectedNote) return;
+
+    getAtoms(selectedNote.id).then((rawAtoms) => {
+      const mapped = rawAtoms.map((a: any) => ({
+        id: a.id,
+        title: a.title,
+        content: a.content,
+        type: a.type,
+      }));
+      setAtoms(mapped);
+    });
+  }, [selectedNote]);
 
   // ===== AUTO RESIZE =====
   const resizeTextarea = () => {
@@ -101,14 +94,36 @@ export default function NotesPage() {
     return () => clearTimeout(timeout);
   }, [selectedNote]);
 
+  // ===== EXTRACT =====
+  const handleExtract = async () => {
+    if (!selectedNote) return;
+
+    try {
+      setExtracting(true);
+
+      await extractNote(selectedNote.id);
+
+      const rawAtoms = await getAtoms(selectedNote.id);
+
+      const mapped = rawAtoms.map((a: any) => ({
+        id: a.id,
+        title: a.title,
+        content: a.content,
+        type: a.type,
+      }));
+
+      setAtoms(mapped);
+    } finally {
+      setExtracting(false);
+    }
+  };
+
   // ===== ACTIONS =====
   const handleArchiveNote = () => {
     if (!selectedNote) return;
 
     Modal.confirm({
       title: "Archive this note?",
-      content: "You can restore it later.",
-      okText: "Archive",
       onOk: async () => {
         await archiveNote(selectedNote.id);
         setNotes((prev) => prev.filter((n) => n.id !== selectedNote.id));
