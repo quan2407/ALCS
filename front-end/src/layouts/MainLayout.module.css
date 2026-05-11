@@ -62,14 +62,13 @@
 /* LEFT */
 .editorArea {
   flex: 1;
-  overflow-y: auto;
+  overflow: hidden;
 }
-
 /* CENTER CONTENT */
 .contentInner {
-  max-width: 720px; /* 👈 đẹp hơn 800 */
+  max-width: 720px;
   margin: 0 auto;
-  padding: 60px 40px 120px;
+  padding: 40px 48px 120px;
 }
 
 /* RIGHT PANEL */
