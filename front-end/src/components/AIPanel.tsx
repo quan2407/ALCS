@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import styles from "./AIPanel.module.css";
 import { chatWithNote } from "../api/ai";
+import ReactMarkdown from "react-markdown";
 type Atom = {
   id: number;
   title: string;
@@ -87,8 +88,10 @@ export default function AIPanel({
     try {
       setChatLoading(true);
 
-      const answer = await chatWithNote(selectedNote.id, userInput);
-
+      const answer = await chatWithNote(selectedNote.id, {
+        message: userInput,
+        history: messages,
+      });
       await streamText(answer);
     } finally {
       setChatLoading(false);
@@ -172,7 +175,7 @@ export default function AIPanel({
                       msg.role === "user" ? styles.userBubble : styles.aiBubble
                     }`}
                   >
-                    {msg.content}
+                    <ReactMarkdown>{msg.content}</ReactMarkdown>
                   </div>
                 </div>
               ))}
