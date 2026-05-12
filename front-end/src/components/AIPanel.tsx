@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import styles from "./AIPanel.module.css";
-
+import { chatWithNote } from "../api/ai";
 type Atom = {
   id: number;
   title: string;
@@ -16,16 +16,18 @@ type Message = {
 export default function AIPanel({
   atoms = [],
   extracting = false,
+  selectedNote,
 }: {
   atoms?: Atom[];
   extracting?: boolean;
+  selectedNote?: any;
 }) {
   const [tab, setTab] = useState<"atoms" | "chat">("atoms");
 
   // ===== CHAT =====
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
-
+  const [chatLoading, setChatLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
   // auto scroll
@@ -33,11 +35,43 @@ export default function AIPanel({
     bottomRef.current?.scrollIntoView({
       behavior: "smooth",
     });
-  }, [messages]);
+  }, [messages, chatLoading]);
+  useEffect(() => {
+    setMessages([]);
+  }, [selectedNote?.id]);
+  const streamText = async (text: string) => {
+    let current = "";
 
+    // tạo bubble rỗng trước
+    setMessages((prev) => [
+      ...prev,
+      {
+        role: "assistant",
+        content: "",
+      },
+    ]);
+
+    for (let i = 0; i < text.length; i++) {
+      current += text[i];
+
+      await new Promise((resolve) => setTimeout(resolve, 12));
+
+      setMessages((prev) => {
+        const updated = [...prev];
+
+        updated[updated.length - 1] = {
+          role: "assistant",
+          content: current,
+        };
+
+        return updated;
+      });
+    }
+  };
   // ===== SEND =====
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!input.trim()) return;
+    if (!selectedNote) return;
 
     const userMessage: Message = {
       role: "user",
@@ -50,15 +84,15 @@ export default function AIPanel({
 
     setInput("");
 
-    // fake AI response
-    setTimeout(() => {
-      const aiMessage: Message = {
-        role: "assistant",
-        content: `AI response for: "${userInput}"`,
-      };
+    try {
+      setChatLoading(true);
 
-      setMessages((prev) => [...prev, aiMessage]);
-    }, 700);
+      const answer = await chatWithNote(selectedNote.id, userInput);
+
+      await streamText(answer);
+    } finally {
+      setChatLoading(false);
+    }
   };
 
   return (
@@ -115,7 +149,14 @@ export default function AIPanel({
             <div className={styles.chatMessages}>
               {messages.length === 0 && (
                 <div className={styles.chatEmpty}>
-                  Ask AI about this note...
+                  <div className={styles.emptyIcon}>✨</div>
+                  <div className={styles.emptyTitle}>
+                    Ask AI about this note
+                  </div>
+
+                  <div className={styles.emptyDesc}>
+                    Summarize concepts, explain ideas, or generate quizzes
+                  </div>
                 </div>
               )}
 
@@ -135,7 +176,11 @@ export default function AIPanel({
                   </div>
                 </div>
               ))}
-
+              {chatLoading && (
+                <div className={styles.aiRow}>
+                  <div className={styles.aiBubble}>AI is thinking...</div>
+                </div>
+              )}
               <div ref={bottomRef} />
             </div>
 
@@ -154,8 +199,12 @@ export default function AIPanel({
                 }}
               />
 
-              <button className={styles.sendBtn} onClick={handleSend}>
-                ↑
+              <button
+                className={styles.sendBtn}
+                onClick={handleSend}
+                disabled={chatLoading}
+              >
+                {chatLoading ? "..." : "↑"}
               </button>
             </div>
           </div>

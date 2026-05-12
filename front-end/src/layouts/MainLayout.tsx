@@ -110,7 +110,11 @@ export default function MainLayout({
 
             {/* 🔥 AI PANEL */}
             <div className={styles.aiPanel}>
-              <AIPanel atoms={atoms} extracting={extracting} />
+              <AIPanel
+                atoms={atoms}
+                extracting={extracting}
+                selectedNote={selectedNote}
+              />{" "}
             </div>
           </div>
         </Content>
