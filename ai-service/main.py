@@ -17,6 +17,9 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 class NoteRequest(BaseModel):
     content: str
+class ChatRequest(BaseModel):
+    note: str
+    message: str
 API_KEY = os.getenv("GEMINI_API_KEY")
 
 client = genai.Client(api_key=API_KEY)
@@ -165,6 +168,37 @@ async def analyze_text(
 
     except Exception as e:
         print(f"Error detail: {str(e)}") 
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/chat")
+async def chat(
+    request: ChatRequest,
+    auth: str = Security(verify_internal_auth)
+):
+    try:
+        prompt = f"""
+        You are an AI learning assistant.
+
+        Answer the user's question based on the provided note.
+
+        NOTE:
+        {request.note}
+
+        USER QUESTION:
+        {request.message}
+        """
+
+        response = client.models.generate_content(
+            model="gemini-3-flash-preview",
+            contents=prompt
+        )
+
+        return {
+            "answer": response.text
+        }
+
+    except Exception as e:
+        print(f"Chat error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
