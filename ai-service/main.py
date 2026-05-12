@@ -20,6 +20,7 @@ class NoteRequest(BaseModel):
 class ChatRequest(BaseModel):
     note: str
     message: str
+    history: str = ""
 API_KEY = os.getenv("GEMINI_API_KEY")
 
 client = genai.Client(api_key=API_KEY)
@@ -177,16 +178,25 @@ async def chat(
 ):
     try:
         prompt = f"""
-        You are an AI learning assistant.
+You are a concise AI study assistant.
 
-        Answer the user's question based on the provided note.
+Rules:
+- Answer naturally like ChatGPT
+- Keep responses short and conversational
+- Do not over explain
+- Use previous conversation context
+- If the note contains wrong information, correct it briefly
+- Answer in the same language as the user
 
-        NOTE:
-        {request.note}
+NOTE:
+{request.note}
 
-        USER QUESTION:
-        {request.message}
-        """
+CHAT HISTORY:
+{request.history}
+
+USER:
+{request.message}
+"""
 
         response = client.models.generate_content(
             model="gemini-3-flash-preview",
