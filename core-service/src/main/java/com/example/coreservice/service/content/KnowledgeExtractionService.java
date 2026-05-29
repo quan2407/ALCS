@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -33,7 +34,7 @@ public class KnowledgeExtractionService {
     private final KnowledgeAtomRepository atomRepository;
     private final KnowledgeAtomMapper atomMapper;
     private final SecurityUtils securityUtils;
-
+    private final ChunkingService chunkingService;
     @Value("${app.ai-service.internal-token}")
     private String internalToken;
 
@@ -51,28 +52,49 @@ public class KnowledgeExtractionService {
         log.info("Start extracting atoms for noteId={}", noteId);
 
         try {
-            List<AIExtractionResponse> responses = callAIWithRetry(note);
 
-            if (responses == null || responses.isEmpty()) {
+            List<String> chunks =
+                    chunkingService.splitIntoChunks(note.getContent());
+
+            List<KnowledgeAtom> allAtoms = new ArrayList<>();
+
+            for (String chunk : chunks) {
+
+                List<AIExtractionResponse> responses =
+                        callAIWithRetry(chunk);
+
+                if (responses == null || responses.isEmpty()) {
+                    continue;
+                }
+
+                List<KnowledgeAtom> atoms =
+                        mapToAtoms(responses, note);
+
+                allAtoms.addAll(atoms);
+            }
+
+            if (allAtoms.isEmpty()) {
                 throw new AppException(ErrorCode.AI_EMPTY_RESULT);
             }
 
-            List<KnowledgeAtom> atoms = mapToAtoms(responses, note);
+            saveAtomsSafely(note, allAtoms);
 
-            saveAtomsSafely(note, atoms);
-
-            updateMetrics(note, atoms);
+            updateMetrics(note, allAtoms);
 
             note.setProcessingStatus(ProcessingStatus.DONE);
 
-            log.info("Finished extracting {} atoms for noteId={}", atoms.size(), noteId);
+            log.info(
+                    "Finished extracting {} atoms for noteId={}",
+                    allAtoms.size(),
+                    noteId
+            );
 
         } catch (Exception e) {
+
             note.setProcessingStatus(ProcessingStatus.FAILED);
             throw e;
 
         } finally {
-            // 4. LUÔN SAVE LẠI TRẠNG THÁI
             noteRepository.save(note);
         }
     }
@@ -103,7 +125,7 @@ public class KnowledgeExtractionService {
 
         noteRepository.save(note);
     }
-    private List<AIExtractionResponse> callAIWithRetry(Note note) {
+    private List<AIExtractionResponse> callAIWithRetry(String content) {
         int maxRetry = 3;
 
         for (int i = 1; i <= maxRetry; i++) {
@@ -111,7 +133,7 @@ public class KnowledgeExtractionService {
                 return aiWebClient.post()
                         .uri("/analyze")
                         .header("X-ALCS-Internal-Token", internalToken)
-                        .bodyValue(Map.of("content", note.getContent()))
+                        .bodyValue(Map.of("content", content))
                         .retrieve()
                         .bodyToFlux(AIExtractionResponse.class)
                         .collectList()

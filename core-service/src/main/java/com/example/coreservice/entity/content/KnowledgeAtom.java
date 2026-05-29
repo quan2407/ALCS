@@ -21,10 +21,11 @@ public class KnowledgeAtom extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @ManyToOne
+    private Note note;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "note_id", nullable = false)
-    private Note note;
+    private NoteChunk chunk;
 
     private String title;
 

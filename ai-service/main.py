@@ -45,7 +45,6 @@ def get_embeddings(text: str):
         return result.embeddings[0].values
     except Exception as e:
         print(f"Lỗi với gemini-embedding-2: {e}")
-        # Fallback sang bản ổn định 001
         try:
             result = client.models.embed_content(
                 model="models/gemini-embedding-001",
